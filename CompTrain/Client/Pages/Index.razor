@@ -1,0 +1,12 @@
+﻿@page "/"
+
+
+
+<AuthorizeView Roles="Admin,Owner">
+    <Authorized>
+        <ShowWodRedirect/>
+    </Authorized>
+    <NotAuthorized>
+        <PageTitle Title="Evolution Program" Description="Welcome to your fitness app."/>
+    </NotAuthorized>
+</AuthorizeView>

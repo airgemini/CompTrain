@@ -1,0 +1,9 @@
+﻿@inject NavigationManager navManager
+@attribute [Authorize(Roles = "Admin,Owner,ActiveUser")]
+
+@code {
+    protected override void OnInitialized()
+    {
+        navManager.NavigateTo("/wod/week");
+    }
+}

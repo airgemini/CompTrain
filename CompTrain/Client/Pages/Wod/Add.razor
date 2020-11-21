@@ -1,0 +1,139 @@
+﻿@page "/wod/add/"
+@page "/wod/add/{date:datetime}"
+@attribute [Authorize(Roles = "Admin,Owner")]
+@inject HttpClient Http
+@inject NavigationManager navManager
+@using CompTrain.Shared.Models.Wod
+@using CompTrain.Shared.Models.Data
+@using CompTrain.Client.Custom
+
+<PageTitle Title="@PageTitle" Description="Gestisci al meglio la tua programmazione giornaliera" />
+
+@if (model != null)
+{
+    <EditForm Model="model" OnValidSubmit="AddWod">
+        <div class="row">
+            <div class="col-sm-12">
+                <FluentValidator />
+                <div class="form-group">
+                    <label for="descriptionWod">Description</label>
+                    <InputText @bind-Value="model.Description" id="descriptionWod" class="form-control form-control-sm" />
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            @foreach (var workout in model.WorkoutRequests?.ToList())
+            {
+                <div class="col-sm-12 col-md-12 mt-3 mb-3 p-3 shadow rounded">
+                    <div class="form-group">
+                        <h4>
+                            @workout.Workouttype.Name
+                            <button type="button" class="close" aria-label="Close" @onclick="@((args) => DeleteWorkout(workout.Workouttype.Id))">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+
+                        </h4>
+                        <InputTextArea @bind-Value="workout.Description" rows="7" class="form-control form-control-sm" />
+                        <ValidationMessage For="@(() => workout.Description)" />
+                    </div>
+                    <div class="form-group">
+                        <label for="sex">Result type</label>
+                        <InputSelectNumber @bind-Value="workout.ResulttypeId" id="sex" class="form-control form-control-sm">
+                            @foreach (var resulttype in model.Resulttypes)
+                                    {
+                                <option value="@resulttype.Id">@resulttype.Name</option>
+                                    }
+                        </InputSelectNumber>
+                    </div>
+                    <ValidationMessage For="@(() => workout.ResulttypeId)" />
+                </div>
+            }
+        </div>
+        @if (workouttypes != null && workouttypes.Count > 0)
+        {
+            <div class="row">
+                <div class="col-sm-12 col-md-12 mt-3 mb-3 p-3 shadow rounded">
+                    <form class="form-inline">
+                        <label class="my-1 mr-2" for="addWorkout">Select workout</label>
+                        <select class="form-control my-1 mr-sm-2" id="addWorkout" @bind="@WorkouttypeSelected">
+                            <option>:: select :: </option>
+                            @foreach (var workouttype in model.Workouttypes)
+                            {
+                                <option value="@workouttype.Id">@workouttype.Name</option>
+                            }
+                        </select>
+                        <button type="button" class="btn btn-sm btn-outline-primary ml-3 my-1" @onclick="AddWorkout">ADD</button>
+                    </form>
+                </div>
+            </div>
+        }
+        <div class="row">
+            <div class="col-sm-12">
+                <ValidationSummary />
+                <button type="submit" class="btn btn-primary btn-block mr-2">SAVE</button>
+            </div>
+        </div>
+    </EditForm>
+}
+@code {
+    [Parameter]
+    public DateTime date { get; set; } = DateTime.Now;
+
+    WodRequest model;
+    string PageTitle = "Gestione WOD";
+    IList<Workouttype> workouttypes = null;
+    string WorkouttypeSelected = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (date == DateTime.MinValue)
+            date = DateTime.Now;
+
+        PageTitle += $" di {date.ToString("dddd dd/MM/yyyy")}";
+
+        model = await Http.GetFromJsonAsync<WodRequest>($"api/wods/add/{date.ToString("yyyy-MM-dd")}");
+        workouttypes = model.Workouttypes;
+    }
+
+    public async Task AddWod()
+    {
+        var response = await Http.PostAsJsonAsync<WodRequest>("api/wods", model);
+        model = await response.Content.ReadFromJsonAsync<WodRequest>();
+        if (model.IsSaved)
+            navManager.NavigateTo($"/wod/agenda/{date.ToString("yyyy-MM-dd")}");
+    }
+
+    public void DeleteWorkout(int WorkoutId)
+    {
+        if (model.WorkoutRequests == null)
+            return;
+
+        var workout = model.WorkoutRequests.FirstOrDefault(x => x.Workouttype.Id == WorkoutId);
+
+        if (workout == null)
+            return;
+
+        model.WorkoutRequests.Remove(workout);
+    }
+
+    public void AddWorkout()
+    {
+        int WorkouttypeId;
+        if (String.IsNullOrEmpty(WorkouttypeSelected) || !int.TryParse(WorkouttypeSelected, out WorkouttypeId))
+            return;
+
+        Workouttype workouttype = model.Workouttypes.FirstOrDefault(x => x.Id == WorkouttypeId);
+
+        if (workouttype == null)
+            return;
+
+        if (model.WorkoutRequests == null)
+        {
+            model.WorkoutRequests = new List<WorkoutRequest>();
+        }
+
+        model.WorkoutRequests.Add(new WorkoutRequest { Workouttype = workouttype});
+    }
+
+}

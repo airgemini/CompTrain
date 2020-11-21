@@ -1,0 +1,126 @@
+﻿@page "/wod/week"
+@page "/wod/week/{dateWeek:datetime}"
+@attribute [Authorize(Roles = "Admin,Owner,ActiveUser")]
+@inject HttpClient Http
+@inject NavigationManager navManager
+@using CompTrain.Shared.Models.Data
+@using CompTrain.Shared.Models.Wod
+
+<PageTitle Title="Your week" Description="La tua settimana di allenamento" />
+
+@if (showResponse != null)
+{
+
+    <div class="row">
+        <div class="col-md-6">
+            <select class="form-control" @onchange="@((e) => Change(Convert.ToDateTime(e.Value)))">
+                @foreach (var showResponse in showResponses)
+                {
+                    @if (showResponse.IsSelected)
+                    {
+                        <option selected>@showResponse.Date.ToString("dddd, dd/MMMM")@(showResponse.Date.Date == DateTime.Now.Date ? " (oggi)" : "")</option>
+                    }
+                    else
+                    {
+                        <option>@showResponse.Date.ToString("dddd, dd/MMMM")@(showResponse.Date.Date == DateTime.Now.Date ? " (oggi)" : "")</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="col-md-6">
+            <nav aria-label="Agenda Navigation">
+                <ul class="pagination justify-content-end">
+                    <li class="page-item">
+                        <a class="page-link" href="/wod/week/@showResponses.FirstOrDefault().Date.AddDays(-1).ToString("yyyy-MM-dd")" tabindex="-1"><i class="fas fa-step-backward"></i></a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="/wod/week/@showResponses.LastOrDefault().Date.AddDays(1).ToString("yyyy-MM-dd")"><i class="fas fa-step-forward"></i></a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <hr />
+    <h3 class="text-center">@showResponse.Date.ToString("dddd, dd MMMM yyyy")</h3>
+    if (showResponse.Wod != null)
+    {
+        <p class="text-center">@showResponse.Wod.Description</p>
+        <div class="card-deck mb-3 text-center">
+            @foreach (var workout in showResponse.Wod.Workouts)
+            {
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-header">
+                        <h4 class="my-0 font-weight-normal">@workout.Workouttype.Name</h4>
+                    </div>
+                    <div class="card-body">
+                        <p>@((MarkupString)$"{workout.Description.Replace(Environment.NewLine,"<br />")}")</p>
+                    </div>
+                    <div class="card-footer">
+                        @if (workout.ResulttypeId != 6)
+                        {
+                            <button type="button" class="btn btn-lg btn-block btn-sm btn-outline-success"><i class="fas fa-trophy"></i> score</button>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else if (showResponse.IsRest)
+    {
+        <p class="text-center">REST DAY</p>
+    }
+    else
+    {
+        <p class="text-center">IL PROGRAMMA DI OGGI NON E' STATO INSERITO</p>
+    }
+}
+
+@code {
+    [Parameter]
+    public DateTime dateWeek { get; set; } = DateTime.Now;
+
+    List<ShowResponse> showResponses = null;
+    ShowResponse showResponse = null;
+
+    protected async override Task OnInitializedAsync()
+    {
+
+        await LoadWeek(dateWeek);
+    }
+
+    protected async override Task OnParametersSetAsync()
+    {
+        await LoadWeek(dateWeek);
+    }
+
+    async Task LoadWeek(DateTime date)
+    {
+        if (dateWeek == DateTime.MinValue)
+            dateWeek = DateTime.Now;
+
+        showResponses = await Http.GetFromJsonAsync<List<ShowResponse>>($"api/wods/week/{dateWeek.ToString("yyyy-MM-dd")}");
+        if (showResponses?.Count() > 0)
+        {
+            Change(dateWeek);
+        }
+    }
+
+    void Change(DateTime dateSelect)
+    {
+        if (showResponses == null)
+            return;
+
+        showResponses.ForEach(x => x.IsSelected = false);
+
+        if (showResponses.FirstOrDefault(x => x.Date.Date == dateSelect.Date) != null)
+        {
+            showResponse = showResponses.FirstOrDefault(x => x.Date.Date == dateSelect.Date);
+        }
+        else
+        {
+            showResponse = showResponses.FirstOrDefault();
+        }
+        showResponse.IsSelected = true;
+    }
+}

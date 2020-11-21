@@ -1,0 +1,102 @@
+﻿@page "/account/register"
+@layout AuthLayout
+@inject HttpClient Http
+@using CompTrain.Shared.Models.Account;
+@inject NavigationManager navManager
+
+
+@if ((registerResponse?.IsSuccess).GetValueOrDefault() == false)
+{
+    <h2 class="text-center">Create new account</h2>
+    <EditForm Model="model" OnValidSubmit="RegisterUser">
+        <div class="row">
+            <div class="col">
+                <div class="form-group">
+                    <label for="firstName">First Name</label>
+                    <InputText @bind-Value="model.FirstName" id="firtName" class="form-control form-control-sm" />
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label for="lastName">Last Name</label>
+                    <InputText @bind-Value="model.LastName" id="lastName" class="form-control form-control-sm" />
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="form-group">
+                    <label for="birthday">Birthday</label>
+                    <InputDate @bind-Value="model.Birthday" id="birthday" class="form-control form-control-sm" />
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label for="sex">Sex</label>
+                    <InputSelect @bind-Value="model.Sex" id="sex" class="form-control form-control-sm">
+                        <option value=""></option>
+                        <option value="M">Man</option>
+                        <option value="W">Woman</option>
+                    </InputSelect>
+                </div>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="email" class="col-sm-5 col-form-label">Email</label>
+            <div class="col-sm-7">
+                <InputText @bind-Value="model.Email" id="email" class="form-control form-control-sm" type="email" />
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label for="password" class="col-sm-5 col-form-label">Password</label>
+            <div class="col-sm-7">
+                <InputText @bind-Value="model.Password" id="password" class="form-control form-control-sm" type="password" />
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label for="confirmPassword" class="col-sm-5 col-form-label">Confirm Password</label>
+            <div class="col-sm-7">
+                <InputText @bind-Value="model.ConfirmPassword" id="confirmPassword" class="form-control form-control-sm" type="password" />
+            </div>
+        </div>
+
+
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+
+        <Alert Title="Attenzione" ErrorList="registerResponse?.Errors" />
+
+        <hr />
+        <button type="submit" class="btn btn-primary btn-block mr-2">REGISTER</button>
+
+    </EditForm>
+    <hr />
+    <div class="row">
+        <div class="col">
+            <a class="btn btn-block btn-sm mr-2 btn-outline-success" href="/account/login">login</a>
+
+        </div>
+        <div class="col">
+            <a class=" btn btn-block btn-sm mr-2 btn-outline-warning" href="/account/forgotpassword">reset password</a>
+        </div>
+    </div>
+}
+else
+{
+    <EmailSent Email="@model.Email" />
+}
+
+
+@code {
+    RegisterRequest model = new RegisterRequest();
+    RegisterResponse registerResponse = null;
+
+    public async Task RegisterUser()
+    {
+        var response = await Http.PostAsJsonAsync<RegisterRequest>("api/accounts/register", model);
+        registerResponse = await response.Content.ReadFromJsonAsync<RegisterResponse>();
+    }
+}

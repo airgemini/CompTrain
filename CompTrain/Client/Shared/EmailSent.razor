@@ -1,0 +1,16 @@
+﻿<div class="alert alert-success" role="alert">
+    <h4 class="alert-heading">Perfetto!</h4>
+    <p>Controlla nella tua posta elettronica perché ti abbiamo appena inviato una email.</p>
+    @if (!String.IsNullOrEmpty(Email))
+    {
+        <hr>
+        <p class="mb-0">Il tuo indirizzo ci risulta essere <strong>@Email</strong></p>
+    }
+</div>
+
+
+@code {
+    [Parameter]
+    public string Email { get; set; }
+
+}

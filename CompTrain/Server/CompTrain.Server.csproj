@@ -1,0 +1,96 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <DisableImplicitComponentsAnalyzers>true</DisableImplicitComponentsAnalyzers>
+    <UserSecretsId>94e0cfe8-2e07-42a4-a210-9032f8e12951</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Migrations\20200327132347_InitDBTrain.cs" />
+    <Compile Remove="Migrations\20200327132347_InitDBTrain.Designer.cs" />
+    <Compile Remove="Migrations\20200329081138_AthleteModel.cs" />
+    <Compile Remove="Migrations\20200329081138_AthleteModel.Designer.cs" />
+    <Compile Remove="Migrations\20200403105112_OtherTables.cs" />
+    <Compile Remove="Migrations\20200403105112_OtherTables.Designer.cs" />
+    <Compile Remove="Migrations\20200403122617_AddIsAutomaticColumnWorkoutType.cs" />
+    <Compile Remove="Migrations\20200403122617_AddIsAutomaticColumnWorkoutType.Designer.cs" />
+    <Compile Remove="Migrations\20200404143438_ResultypeNewColumns.cs" />
+    <Compile Remove="Migrations\20200404143438_ResultypeNewColumns.Designer.cs" />
+    <Compile Remove="Migrations\20200404155521_Wod2Workout.cs" />
+    <Compile Remove="Migrations\20200404155521_Wod2Workout.Designer.cs" />
+    <Compile Remove="Migrations\20200404160631_WodDateField.cs" />
+    <Compile Remove="Migrations\20200404160631_WodDateField.Designer.cs" />
+    <Compile Remove="Migrations\20200404160853_WodDateField_v2.cs" />
+    <Compile Remove="Migrations\20200404160853_WodDateField_v2.Designer.cs" />
+    <Compile Remove="Migrations\20200406101558_InitSqlLite.cs" />
+    <Compile Remove="Migrations\20200406101558_InitSqlLite.Designer.cs" />
+    <Compile Remove="Migrations\20200406101917_InitSqlLite_v2.cs" />
+    <Compile Remove="Migrations\20200406101917_InitSqlLite_v2.Designer.cs" />
+    <Compile Remove="Migrations\20200406102554_InitSqlLite_v3.cs" />
+    <Compile Remove="Migrations\20200406102554_InitSqlLite_v3.Designer.cs" />
+    <Compile Remove="Migrations\20200410102235_RestDays.cs" />
+    <Compile Remove="Migrations\20200410102235_RestDays.Designer.cs" />
+    <Compile Remove="Migrations\20200411091521_RestDays.cs" />
+    <Compile Remove="Migrations\20200411091521_RestDays.Designer.cs" />
+    <Compile Remove="Migrations\20200418090736_ResultypeId.cs" />
+    <Compile Remove="Migrations\20200418090736_ResultypeId.Designer.cs" />
+    <Compile Remove="Migrations\20200418091328_WorkoutCols.cs" />
+    <Compile Remove="Migrations\20200418091328_WorkoutCols.Designer.cs" />
+    <Compile Remove="Migrations\20200418091847_WorkoutFK.cs" />
+    <Compile Remove="Migrations\20200418091847_WorkoutFK.Designer.cs" />
+    <Compile Remove="Migrations\20200418092214_WorkoutFK_v2.cs" />
+    <Compile Remove="Migrations\20200418092214_WorkoutFK_v2.Designer.cs" />
+    <Compile Remove="Migrations\20200419054839_SQLite.cs" />
+    <Compile Remove="Migrations\20200419054839_SQLite.Designer.cs" />
+    <Compile Remove="Migrations\20200419054944_SQLite.cs" />
+    <Compile Remove="Migrations\20200419054944_SQLite.Designer.cs" />
+    <Compile Remove="Migrations\20200419055334_SQLite.cs" />
+    <Compile Remove="Migrations\20200419055334_SQLite.Designer.cs" />
+    <Compile Remove="Migrations\20200419055631_SQLite.cs" />
+    <Compile Remove="Migrations\20200419055631_SQLite.Designer.cs" />
+    <Compile Remove="Migrations\20200419055812_SQLite.cs" />
+    <Compile Remove="Migrations\20200419055812_SQLite.Designer.cs" />
+    <Compile Remove="Migrations\20200419060639_SQLite.cs" />
+    <Compile Remove="Migrations\20200419060639_SQLite.Designer.cs" />
+    <Compile Remove="Migrations\20200419060808_SQLite.cs" />
+    <Compile Remove="Migrations\20200419060808_SQLite.Designer.cs" />
+    <Compile Remove="Migrations\20200421103144_MySQLStart.cs" />
+    <Compile Remove="Migrations\20200421103144_MySQLStart.Designer.cs" />
+    <Compile Remove="Migrations\20200421103400_MariaDBStart.cs" />
+    <Compile Remove="Migrations\20200421103400_MariaDBStart.Designer.cs" />
+    <Compile Remove="Migrations\20200422054127_Start.cs" />
+    <Compile Remove="Migrations\20200422054127_Start.Designer.cs" />
+    <Compile Remove="Migrations\20200422054540_Start.cs" />
+    <Compile Remove="Migrations\20200422054540_Start.Designer.cs" />
+    <Compile Remove="Migrations\20200422054628_Start.cs" />
+    <Compile Remove="Migrations\20200422054628_Start.Designer.cs" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="3.2.0-preview4.20210.8" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="3.1.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Client\CompTrain.Client.csproj" />
+    <ProjectReference Include="..\Shared\CompTrain.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\Models\" />
+  </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
+
+
+</Project>

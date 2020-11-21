@@ -1,0 +1,14 @@
+﻿@page "/account/logout"
+@inject ILoginService loginService
+@inject NavigationManager navigationManager
+@layout MainLayout
+
+<text>Bye!</text>
+
+@code {
+    protected async override Task OnInitializedAsync()
+    {
+        await loginService.Logout();
+        navigationManager.NavigateTo("");
+    }
+}

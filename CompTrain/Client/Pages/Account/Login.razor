@@ -1,0 +1,52 @@
+﻿@page "/account/login"
+@layout AuthLayout
+@inject HttpClient Http
+@using CompTrain.Shared.Models.Account;
+@inject NavigationManager navManager
+@inject ILoginService  loginService
+
+<h2 class="text-center">Login</h2>
+<EditForm Model="model" OnValidSubmit="UserLogin">
+    <div class="form-group">
+        <label for="email">Email</label>
+        <InputText @bind-Value="model.Email" id="email" class="form-control form-control-sm" type="email" />
+    </div>
+
+    <div class="form-group">
+        <label for="password">Password</label>
+        <InputText @bind-Value="model.Password" id="password" class="form-control form-control-sm" type="password" />
+    </div>
+
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <Alert Title="Attenzione" ErrorList="loginResponse?.Errors" />
+
+    <hr />
+    <button type="submit" class="btn btn-success btn-block mr-2">LOGIN</button>
+</EditForm>
+<hr />
+<div class="row">
+    <div class="col">
+        <a class="btn btn-block btn-sm mr-2 btn-outline-info" href="/account/register">register</a>
+    </div>
+    <div class="col">
+        <a class=" btn btn-block btn-sm mr-2 btn-outline-warning" href="/account/forgotpassword">reset password</a>
+    </div>
+</div>
+
+@code {
+    LoginRequest model = new LoginRequest();
+    LoginResponse loginResponse = null;
+
+    public async Task UserLogin()
+    {
+        var response = await Http.PostAsJsonAsync<LoginRequest>("api/accounts/login", model);
+        loginResponse = await response.Content.ReadFromJsonAsync<LoginResponse>();
+        if (loginResponse.IsSuccess)
+        {
+            await loginService.Login(loginResponse.Token);
+            navManager.NavigateTo("");
+        }
+    }
+}

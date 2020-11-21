@@ -1,0 +1,80 @@
+﻿<header>
+    <nav class="navbar navbar-expand-lg navbar-light px-md-5 p-2 bg-white border-bottom shadow-sm">
+        <div class="d-flex flex-grow-1">
+            <span class="w-100 d-lg-none d-block"><!-- hidden spacer to center brand on mobile --></span>
+            <a class="navbar-brand" href="#">
+                <img src="img/logo.png" width="30" height="30" class="d-inline-block align-top mr-1" alt="Evolution Program">Evolution Program
+            </a>
+            <div class="w-100 text-right">
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-app-custom">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+        </div>
+        <div class="collapse navbar-collapse flex-grow-1 text-right" id="navbar-app-custom">
+            <ul class="navbar-nav ml-auto flex-nowrap">
+                <AuthorizeView Roles="Admin,Owner,ActiveUser">
+                    <li class="nav-item">
+                        <NavLink class="nav-link" href="wod/week">
+                            Your week
+                        </NavLink>
+                    </li>
+                </AuthorizeView>
+
+                <AuthorizeView Roles="Admin,Owner">
+                    <li class="nav-item">
+                        <NavLink class="nav-link" href="wod/agenda">
+                            Programming
+                        </NavLink>
+                    </li>
+                </AuthorizeView>
+
+                <AuthorizeView Roles="Admin">
+                    <li class="nav-item">
+                        <NavLink class="nav-link" href="role/index">
+                            Roles
+                        </NavLink>
+                    </li>
+                </AuthorizeView>
+
+                <!--
+    <li class="nav-item">
+        <NavLink class="nav-link" href="counter">
+            Counter
+        </NavLink>
+    </li>
+    <li class="nav-item">
+        <NavLink class="nav-link" href="fetchdata">
+            Fetch data
+        </NavLink>
+    </li>
+    -->
+
+                <AuthorizeView>
+                    <Authorized>
+                        <li class="nav-item">
+                            <NavLink class="nav-link" href="account/logout">
+                                Logout
+                            </NavLink>
+                        </li>
+                    </Authorized>
+                    <NotAuthorized>
+                        <li class="nav-item">
+                            <NavLink class="nav-link" href="account/register">
+                                Register
+                            </NavLink>
+                        </li>
+
+                        <li class="nav-item">
+                            <NavLink class="nav-link" href="account/login">
+                                Login
+                            </NavLink>
+                        </li>
+                    </NotAuthorized>
+                </AuthorizeView>
+
+
+            </ul>
+        </div>
+    </nav>
+</header>

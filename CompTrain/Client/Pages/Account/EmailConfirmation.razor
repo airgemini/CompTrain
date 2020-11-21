@@ -1,0 +1,38 @@
+﻿@page "/account/emailconfirmation"
+@layout AuthLayout
+@inject HttpClient Http
+@inject NavigationManager navManager
+@using CompTrain.Shared.Models.Account;
+
+<div class="alert alert-warning" role="alert">
+    <h4 class="alert-heading">Ops..</h4>
+    <p>Qualcosa &egrave; andato storto, controlla l'indirizzo che ti è stato inviato per email.</p>
+    <hr>
+    <p class="mb-0">L'indirizzo email non è confermato e quindi non potrai effettuare la login.</p>
+</div>
+
+@code {
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        EmailConfirmationRequest emailConfirmationRequest = new EmailConfirmationRequest();
+
+        var uri = navManager.ToAbsoluteUri(navManager.Uri);
+
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("userid", out var userid) && QueryHelpers.ParseQuery(uri.Query).TryGetValue("code", out var code))
+        {
+            emailConfirmationRequest.UserId = userid.First();
+            emailConfirmationRequest.Code = code.First();
+        }
+
+        if (!String.IsNullOrEmpty(emailConfirmationRequest.UserId) && !String.IsNullOrEmpty(emailConfirmationRequest.Code))
+        {
+            var response = await Http.PostAsJsonAsync<EmailConfirmationRequest>("api/accounts/emailconfirmation", emailConfirmationRequest);
+            bool IsValid = await response.Content.ReadFromJsonAsync<bool>();
+            if (IsValid)
+            {
+                navManager.NavigateTo("/account/login");
+            }
+        }
+    }
+}

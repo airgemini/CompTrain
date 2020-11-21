@@ -1,0 +1,175 @@
+﻿@page "/role/index"
+@attribute [Authorize(Roles = "Admin")]
+@layout MainLayout
+@inject HttpClient Http
+@using CompTrain.Shared.Models.Role;
+
+<h2>Manage Roles</h2>
+<div class="row">
+
+    <div class="col-4 mt-5 shadow p-3 mb-5 bg-white rounded">
+        <h4 class="text-center">Role list</h4>
+        @if (roleResponses != null)
+        {
+            <div class="list-group">
+                @foreach (var role in roleResponses)
+                {
+                    <button type="button" class="list-group-item list-group-item-action" @onclick="@((args) => Selected(role.Id))">@role.Name</button>
+                }
+            </div>
+        }
+        <hr />
+        <button class="btn btn-primary btn-sm btn-block" @onclick="@((args) => AddRole(args))">new role</button>
+    </div>
+
+    @if (model != null)
+    {
+        <div class="col-4 mt-5 shadow p-3 mb-5 bg-white rounded">
+            <h4 class="text-center">Role @buttonTitle</h4>
+            <EditForm Model="model" OnValidSubmit="SaveRole">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <InputText @bind-Value="model.Name" id="name" class="form-control form-control-sm" />
+                </div>
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <Alert Title="Attenzione" ErrorList="editRoleResponse?.Errors" />
+                <button type="submit" class="btn btn-warning btn-sm btn-block">@buttonTitle</button>
+            </EditForm>
+            <hr />
+            @if (userWithRole?.Count > 0)
+            {
+
+                <h4 class="text-center">User in role</h4>
+                <ul class="list-group">
+                    @foreach (var user in userWithRole)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            @user.Name
+                            <button class="btn btn-danger btn-sm" @onclick="@(() => AddRemoveUserRole(user.Id))"><i class="far fa-trash-alt"></i></button>
+                        </li>
+                    }
+                </ul>
+                <hr />
+            }
+        </div>
+        @if (userWithoutRole?.Count > 0)
+        {
+        <div class="col-4 mt-5 shadow p-3 mb-5 bg-white rounded">
+            <div class="form-group">
+                <label for="userSelect">Add user</label>
+                <select class="form-control" id="userSelect" @onchange="@((args) => AddRemoveUserRole(args.Value))">
+                    <option value=""></option>
+                    @foreach (var user in userWithoutRole)
+                    {
+                        <option value="@user.Id">@user.Name</option>
+                    }
+                </select>
+            </div>
+        </div>
+        }
+    }
+</div>
+@code {
+    EditRoleRequest model;
+    EditRoleResponse editRoleResponse;
+    List<RoleModel> roleResponses = null;
+    List<RoleUserResponse> roleUserResponses = null;
+    string buttonTitle = "Save";
+    List<RoleUserResponse> userWithRole = null;
+    List<RoleUserResponse> userWithoutRole = null;
+
+    protected async override void OnInitialized()
+    {
+        roleResponses = await Http.GetFromJsonAsync<List<RoleModel>>("api/roles");
+        StateHasChanged();
+    }
+
+    async void Selected(object value)
+    {
+        buttonTitle = "Save";
+        model = new EditRoleRequest
+        {
+            Id = value.ToString(),
+            Name = roleResponses.First(x => x.Id.Equals(value.ToString())).Name
+        };
+
+        roleUserResponses = await Http.GetFromJsonAsync<List<RoleUserResponse>>($"api/roles/{model.Id}");
+        userWithRole = roleUserResponses.FindAll(x => x.OnRule == true);
+        userWithoutRole = roleUserResponses.FindAll(x => x.OnRule == false);
+        StateHasChanged();
+    }
+
+    void AddRole(MouseEventArgs args)
+    {
+        buttonTitle = "Add";
+        model = new EditRoleRequest();
+    }
+
+    public async Task SaveRole()
+    {
+        HttpResponseMessage response = null;
+
+        if (String.IsNullOrEmpty(model.Id))
+        {
+            response = await Http.PostAsJsonAsync<EditRoleRequest>("api/roles", model);
+        }
+        else
+        {
+            response = await Http.PutAsJsonAsync<EditRoleRequest>("api/roles", model);
+        }
+
+        editRoleResponse = await response.Content.ReadFromJsonAsync<EditRoleResponse>();
+
+        if (editRoleResponse.IsSuccess)
+        {
+            if (String.IsNullOrEmpty(model.Id))
+            {
+                roleResponses.Add(new RoleModel { Id = editRoleResponse.Id, Name = model.Name });
+            }
+            else
+            {
+                roleResponses.First(x => x.Id.Equals(model.Id)).Name = model.Name;
+            }
+            model = null;
+        }
+    }
+
+    async void AddRemoveUserRole(object value)
+    {
+        RoleUserResponse roleUserResponse = roleUserResponses.First(x => x.Id.Equals(value.ToString()));
+        if (roleUserResponse == null)
+            return;
+
+        AddRemoveRoleRequest addRemoveRoleRequest = new AddRemoveRoleRequest
+        {
+            RoleId = model.Id,
+            UserId = roleUserResponse.Id,
+            Add = !roleUserResponse.OnRule
+        };
+        try
+        {
+            var response = await Http.PostAsJsonAsync<AddRemoveRoleRequest>("api/roles/addremove", addRemoveRoleRequest);
+
+            if (await response.Content.ReadFromJsonAsync<bool>())
+            {
+                roleUserResponse.OnRule = !roleUserResponse.OnRule;
+                if (roleUserResponse.OnRule)
+                {
+                    userWithoutRole.RemoveAll(x => x.Id.Equals(addRemoveRoleRequest.UserId));
+                    userWithRole.Add(roleUserResponse);
+                }
+                else
+                {
+                    userWithRole.RemoveAll(x => x.Id.Equals(addRemoveRoleRequest.UserId));
+                    userWithoutRole.Add(roleUserResponse);
+                }
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+}
