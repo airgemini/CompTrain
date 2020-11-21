@@ -1,4 +1,4 @@
-# Applicazione Blazor WebAssembly con autenticazione JWT e IdentyServer
+# Applicazione Blazor WebAssembly con autenticazione JWT ed ASP.NET Identity
 
    Progetto d'esempio che per la realizzazione di un’applicazione completa per la gestione degli allenamenti che prevede 3 livelli di accesso:
    - Anonimo: il sito consentirà di visualizzare le pagine pubbliche
@@ -9,7 +9,7 @@
    Utilizzeremo quindi:
    -	Blazor WebAssembly per il frontend
    -	ASP.NET Core per le API ed autenticazione/autorizzazione
-   -	Identity Server per la gestione degli utenti
+   -	ASP.NET Identity per la gestione degli utenti
    -	Database MySQL/MariaDB
    -	Entity Framework come ORM
    -	JWT Token
